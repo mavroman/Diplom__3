@@ -1,7 +1,6 @@
 package tests;
 
 import client.ApiClient;
-import driver.WebDriverCreator;
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
 import model.User;

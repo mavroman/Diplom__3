@@ -1,7 +1,7 @@
 package tests;
 
 import client.ApiClient;
-import driver.WebDriverCreator;
+import page.MainPage;
 import io.qameta.allure.Description;
 import model.User;
 import org.junit.jupiter.api.AfterEach;
@@ -116,7 +116,7 @@ public class LoginTest {
     @DisplayName("Авторизация через форму регистрации")
     @Description("Проверка перехода на страницу авторизации из формы регистрации и успешный вход")
     public void testLoginRegisterPage() {
-        driver.get("https://stellarburgers.education-services.ru/register");
+        mainPage.openRegisterPage();
         registerPage.waitForLoad();
 
         // клик на кнопку "Войти" на странице регистрации
@@ -137,7 +137,7 @@ public class LoginTest {
     @DisplayName("Авторизация через форму восстановления пароля")
     @Description("Проверка перехода на страницу авторизации из формы восстановления пароля и успешный вход")
     public void testLoginForgotPasswordPage() {
-        driver.get("https://stellarburgers.education-services.ru/forgot-password");
+        mainPage.openForgotPasswordPage();
         forgotPasswordPage.waitForLoad();
 
         // клик на кнопку "Войти" на странице восстановления пароля

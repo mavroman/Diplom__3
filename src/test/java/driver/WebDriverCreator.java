@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,15 +50,16 @@ public class WebDriverCreator {
     }
 
     private static WebDriver createYandexDriver() {
-        // Указываем путь к chromedriver для Яндекс
-        System.setProperty("webdriver.chrome.driver",
-                "C:\\Users\\Roman\\.cache\\selenium\\chromedriver\\win64\\142.0.7444.175\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
 
-        // Путь к Яндекс браузеру
-        String yandexPath = "C:\\Users\\Roman\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe";
-        options.setBinary(yandexPath);
+        Path yandexPath = Paths.get(
+                System.getProperty("user.home"),
+                "AppData", "Local", "Yandex", "YandexBrowser", "Application", "browser.exe"
+        );
+        String pathString = yandexPath.toString();
+        options.setBinary(pathString);
 
         // Важные опции
         options.addArguments("--no-sandbox");
@@ -92,7 +95,7 @@ public class WebDriverCreator {
             return driver;
         } catch (Exception e) {
             System.out.println("Ошибка создания Яндекс драйвера: " + e.getMessage());
-            return createChromeDriver(); // fallback на Chrome
+            return createChromeDriver();
         }
     }
 }

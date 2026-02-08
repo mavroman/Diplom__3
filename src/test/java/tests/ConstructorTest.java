@@ -1,14 +1,12 @@
 package tests;
 
-import client.ApiClient;
 import io.qameta.allure.Description;
-import io.restassured.response.Response;
-import model.User;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
-import page.LoginPage;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import page.MainPage;
-import page.ProfilePage;
+
+import java.time.Duration;
 
 import static driver.WebDriverCreator.createWebDriver;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,40 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConstructorTest {
 
     private WebDriver driver;
-    private ApiClient apiClient;
-    private User user;
-    private String accessToken;
-
+    private WebDriverWait wait;
     private MainPage mainPage;
-    private LoginPage loginPage;
-    private ProfilePage profilePage;
 
     @BeforeEach
     public void setUp() {
-        // Инициализация API клиента для каждого теста
-        apiClient = new ApiClient();
-
-        // Создание уникального пользователя для каждого теста
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String password = "12345678";
-        String email = "romatest-" + timestamp + "-" + Thread.currentThread().getId() + "@yandex.ru";
-        user = new User(email, password, "Roms");
-
-        // Создание пользователя через API
-        Response createResponse = apiClient.createUser(user);
-        assertEquals(200, createResponse.statusCode(),
-                "Не удалось создать тестового пользователя. Ответ: " + createResponse.getBody().asString());
-
-        accessToken = createResponse.body().jsonPath().getString("accessToken");
-        assertNotNull(accessToken, "Access token не должен быть null");
-
         driver = createWebDriver();
         driver.manage().deleteAllCookies();
-
-        // Инициализация страниц для каждого теста
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         mainPage = new MainPage(driver);
-        loginPage = new LoginPage(driver);
-        profilePage = new ProfilePage(driver);
     }
 
     @Test
@@ -59,15 +32,27 @@ public class ConstructorTest {
         mainPage.open();
         mainPage.waitForLoad();
 
-        mainPage.clickSaucesSection();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Проверяем начальное состояние (по умолчанию должны быть Булки)
+        String initialSection = mainPage.getSelectedSectionText();
+        assertEquals("Булки", initialSection, "Изначально должен быть выбран раздел 'Булки'");
 
-        // Клик на раздел "Булки"
+        // Переходим на соусы
+        mainPage.clickSaucesSection();
+
+        // Ждем переключения на соусы
+        wait.until(driver -> {
+            String currentSection = mainPage.getSelectedSectionText();
+            return "Соусы".equals(currentSection);
+        });
+
+        // Переходим обратно на булки
         mainPage.clickBunsSection();
+
+        // Ожидание переключения на булки
+        wait.until(driver -> {
+            String currentSection = mainPage.getSelectedSectionText();
+            return "Булки".equals(currentSection);
+        });
 
         String selectedSection = mainPage.getSelectedSectionText();
         assertNotNull(selectedSection, "Текст выбранного раздела не должен быть null");
@@ -81,14 +66,12 @@ public class ConstructorTest {
         mainPage.open();
         mainPage.waitForLoad();
 
-        // Кликнуть на раздел "Соусы"
         mainPage.clickSaucesSection();
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        wait.until(driver -> {
+            String currentSection = mainPage.getSelectedSectionText();
+            return "Соусы".equals(currentSection);
+        });
 
         String selectedSection = mainPage.getSelectedSectionText();
         assertNotNull(selectedSection, "Текст выбранного раздела не должен быть null");
@@ -104,11 +87,10 @@ public class ConstructorTest {
 
         mainPage.clickFillingsSection();
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        wait.until(driver -> {
+            String currentSection = mainPage.getSelectedSectionText();
+            return "Начинки".equals(currentSection);
+        });
 
         String selectedSection = mainPage.getSelectedSectionText();
         assertNotNull(selectedSection, "Текст выбранного раздела не должен быть null");
@@ -117,15 +99,6 @@ public class ConstructorTest {
 
     @AfterEach
     public void tearDown() {
-        if (accessToken != null && !accessToken.isEmpty()) {
-            try {
-                Response deleteResponse = apiClient.deleteUser(accessToken);
-                System.out.println("Пользователь удален. Статус: " + deleteResponse.getStatusCode());
-            } catch (Exception e) {
-                System.err.println("Ошибка при удалении пользователя: " + e.getMessage());
-            }
-        }
-
         if (driver != null) {
             try {
                 driver.quit();

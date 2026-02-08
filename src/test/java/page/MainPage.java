@@ -13,6 +13,10 @@ public class MainPage {
     private final WebDriver driver;
     private WebDriverWait wait;
 
+    public static final String BASE_URL = "https://stellarburgers.education-services.ru/";
+    public static final String REGISTER_URL = BASE_URL + "register";
+    public static final String FORGOT_PASSWORD_URL = BASE_URL + "forgot-password";
+
     // Локаторы
     private final By loginButton = By.xpath(".//button[text()='Войти в аккаунт']");
     private final By personalAccountButton = By.xpath(".//p[text()='Личный Кабинет']");
@@ -31,7 +35,17 @@ public class MainPage {
 
     @Step("Открыть главную страницу")
     public void open() {
-        driver.get("https://stellarburgers.education-services.ru/");
+        driver.get(BASE_URL);
+    }
+
+    @Step("Открыть страницу регистрации")
+    public void openRegisterPage() {
+        driver.get(REGISTER_URL);
+    }
+
+    @Step("Открыть страницу восстановления пароля")
+    public void openForgotPasswordPage() {
+        driver.get(FORGOT_PASSWORD_URL);
     }
 
     @Step("Кликнуть на кнопку 'Войти в аккаунт'")
@@ -82,24 +96,22 @@ public class MainPage {
         }
     }
 
-
     @Step("Дождаться загрузки главной страницы без авторизации")
     public void waitForLoad() {
-        try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-            wait.until(driver -> {
-                try {
-                    return driver.findElement(By.tagName("body")).isDisplayed();
-                } catch (Exception e) {
-                    return false;
-                }
-            });
+        // Ожидаем загрузки DOM и наличие body
+        wait.until(driver -> driver.findElement(By.tagName("body")).isDisplayed());
 
-            Thread.sleep(2000);
+        // Ожидаем появления одной из ключевых кнопок (для авторизованного или неавторизованного пользователя)
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(loginButton),
+                ExpectedConditions.visibilityOfElementLocated(orderButton)
+        ));
 
-        } catch (Exception e) {
-            System.out.println("Не крит ошибка в waitForLoad: " + e.getMessage());
-        }
+        // Ожидаем кликабельность элемента
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.elementToBeClickable(loginButton),
+                ExpectedConditions.elementToBeClickable(orderButton)
+        ));
     }
 
     @Step("Дождаться загрузки главной страницы с авторизацией")

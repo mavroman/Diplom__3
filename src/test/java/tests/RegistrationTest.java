@@ -1,7 +1,6 @@
 package tests;
 
 import client.ApiClient;
-import driver.WebDriverCreator;
 import io.qameta.allure.Description;
 import model.User;
 import org.junit.jupiter.api.*;
@@ -21,6 +20,7 @@ public class RegistrationTest {
     private LoginPage loginPage;
     private RegistrationPage registrationPage;
     private ProfilePage profilePage;
+    private User createdUser; // добавили поле для хранения созданного пользователя
 
     @BeforeEach
     public void setUp() {
@@ -41,6 +41,8 @@ public class RegistrationTest {
         String uniqueEmail = "roma" + System.currentTimeMillis() + "_" + Thread.currentThread().getId() + "@yandex.ru";
         testUser.setEmail(uniqueEmail);
         testUser.setPassword("12345678"); // Пароль должен соответствовать требованиям
+
+        createdUser = testUser;
 
         mainPage.open();
         mainPage.waitForLoad();
@@ -103,6 +105,14 @@ public class RegistrationTest {
 
     @AfterEach
     public void tearDown() {
+        if (createdUser != null && createdUser.getEmail() != null) {
+            try {
+                apiClient.deleteUser(createdUser.getEmail());
+            } catch (Exception e) {
+                System.err.println("Error deleting user: " + e.getMessage());
+            }
+        }
+
         if (driver != null) {
             try {
                 driver.quit();

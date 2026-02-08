@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"Проверка перехода к разделу с булками в конструкторе","893","Переход к разделу 'Булки'","","2026-02-05","broken","2026-02-05","","tests.ConstructorTest","tests.ConstructorTest","testNavigateToBunsSection"
+"Проверка перехода к разделу с соусами в конструкторе","1066","Переход к разделу 'Соусы'","","2026-02-05","broken","2026-02-05","","tests.ConstructorTest","tests.ConstructorTest","testNavigateToSaucesSection"
+"","553","testWebDriverManager()","","2026-02-05","broken","2026-02-05","","tests.SimpleTest","tests.SimpleTest","testWebDriverManager"
+"Проверка перехода к разделу с начинками в конструкторе","4866","Переход к разделу 'Начинки'","","2026-02-05","broken","2026-02-05","","tests.ConstructorTest","tests.ConstructorTest","testNavigateToFillingsSection"
